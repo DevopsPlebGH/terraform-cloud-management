@@ -35,9 +35,9 @@ jobs:
           - environment: testing
             url: https://app.terraform.io/
 
-    environment:
-      url: ${{ matrix.url }}
-      name: ${{ matrix.environment }}
+    #environment:
+    #  url: ${{ matrix.url }}
+    #  name: ${{ matrix.environment }}
 
     steps:
 
