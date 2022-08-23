@@ -24,7 +24,7 @@ jobs:
         id: tffmt
         run: terraform fmt -check -diff -recursive ./
 
-  plan_and_test:
+  plan-on-test:
     name: Plan and  Test
     runs-on: macos-latest
     strategy:
@@ -107,7 +107,3 @@ jobs:
             #Gray
             ${{ env.PLAN }}
             ```
-
-
-
-
