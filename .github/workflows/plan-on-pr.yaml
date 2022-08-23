@@ -32,7 +32,7 @@ jobs:
       matrix:
         include:
           - environment: testing
-            url: https://app.terraform.io/app/${{ secrets.ORGANIZATION_NAME }}
+            url: https://app.terraform.io/
 
     environment:
       url: ${{ matrix.url }}
