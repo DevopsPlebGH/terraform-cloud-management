@@ -56,7 +56,6 @@ jobs:
         id: plan
         continue-on-error: true
         run: |
-          cd ${{ matrix.path }}
           Get-ChildItem -Path Env: -Recurse -Include TF_VAR_* | ForEach-Object {Write-Output "$($_.Name)=$($_.Value)"} >> $env:GITHUB_ENV
           $Repo = "${{ github.repository }}"
           $BaseUri = "https://api.github.com"
