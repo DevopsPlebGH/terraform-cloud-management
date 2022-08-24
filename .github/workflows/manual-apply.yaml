@@ -2,6 +2,7 @@ name: Terraform Apply
 
 on:
   workflow_dispatch:
+    inputs:
       admin_email:
         description: 'Admin email address for Terraform Cloud Organization'
         required: true
