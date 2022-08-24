@@ -6,10 +6,12 @@ on:
       admin_email:
         description: 'Admin email address for Terraform Cloud Organization'
         required: true
+        default: ${{ secrets.ADMIN_EMAIL }}
         type: string
       name:
         description: 'The name of the Terraform Cloud organization'
         required: true
+        default: ${{ secrets.ORGANIZATION_NAME }}
         type: string
       oauth_token:
         description: 'Github OAuth Token'
