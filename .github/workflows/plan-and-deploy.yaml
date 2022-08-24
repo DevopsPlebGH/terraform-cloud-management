@@ -1,11 +1,8 @@
 name: Deploy on Test
 
 on:
-  workflow_run:
-    workflows: ["Plan and Test"]
+  push:
     branches: [main,dev, stage, test]
-    types:
-      - completed
 defaults:
   run:
     working-directory: ./terraform
