@@ -1,4 +1,4 @@
-name: Deploy on Test
+name: Terraform Apply
 
 on:
   workflow_dispatch:
