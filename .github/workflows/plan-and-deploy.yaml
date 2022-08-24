@@ -3,7 +3,7 @@ name: Deploy on Test
 on:
   workflow_run:
     workflows: ["Plan and Test"]
-    branches: [main,dev, stage, test]
+    branches: [main, dev, stage, test]
     types:
       - completed
 defaults:
