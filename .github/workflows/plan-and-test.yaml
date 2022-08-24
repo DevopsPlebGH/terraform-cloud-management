@@ -1,8 +1,8 @@
-name: Plan / Test on push to test branch
+name: Plan and Test
 
 on:
   pull_request:
-    branches: [test]
+    branches: [main, dev, stage, test]
 defaults:
   run:
     working-directory: ./terraform
