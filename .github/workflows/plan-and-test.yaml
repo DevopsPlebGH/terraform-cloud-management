@@ -27,7 +27,7 @@ jobs:
   plan-on-test:
     name: Plan and  Test
     runs-on: macos-latest
-    #needs: lint
+    needs: lint
     strategy:
       fail-fast: false
       matrix:
