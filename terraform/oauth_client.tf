@@ -8,5 +8,5 @@ module "oauth_client" {
   oauth_token           = var.oauth_token
   organization          = module.organization.tfe_organization_id
   service_provider      = var.service_provider
-  tfe_oauth_client_name = module.organization.tfe_organization_id
+  tfe_oauth_client_name = var.service_provider
 }
