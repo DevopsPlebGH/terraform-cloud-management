@@ -1,7 +1,7 @@
 name: Plan / Test on push to test branch
 
 on:
-  push:
+  pull_request:
     branches: [test]
 defaults:
   run:
@@ -24,9 +24,10 @@ jobs:
         id: tffmt
         run: terraform fmt -check -diff -recursive ./
 
-  plan_and_test:
+  plan-on-test:
     name: Plan and  Test
     runs-on: macos-latest
+    #needs: lint
     strategy:
       fail-fast: false
       matrix:
@@ -108,6 +109,31 @@ jobs:
             ${{ env.PLAN }}
             ```
 
+      - name: Reformat Plan
+        run: |
+          echo '${{ steps.plan.outputs.stdout || steps.plan.outputs.stderr }}' \
+          | sed -E 's/^([[:space:]]+)([-+])/\2\1/g' > plan.txt
 
+      - name: Put Plan in Env Var
+        run: |
+          PLAN=$(cat plan.txt)
+          echo "PLAN<<EOF" >> $GITHUB_ENV
+          echo "$PLAN" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
 
-
+      - name: Post Plan to GitHub PR
+        uses: mshick/add-pr-comment@v1
+        with:
+          allow-repeats: true
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          repo-token-user-login: 'github-actions[bot]'
+          message: |
+            ## ${{ matrix.path }} plan
+            ```diff
+            + Green
+            - Red
+            ! Orange
+            @@ Pink @@
+            #Gray
+            ${{ env.PLAN }}
+            ```
