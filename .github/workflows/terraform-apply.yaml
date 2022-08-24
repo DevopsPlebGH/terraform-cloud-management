@@ -1,8 +1,23 @@
 name: Deploy on Test
 
 on:
+  workflow_dispatch:
+    inputs:
+      admin_email:
+        description: 'Admin email address for Terraform Cloud Organization'
+        required: true
+        type: string
+      name:
+        description: 'The name of the Terraform Cloud organization'
+        required: true
+        type: string
+      oauth_token:
+        description: 'Github OAuth Token'
+        required: true
+        type: string
+    branches: [test]
   push:
-    branches: [main,dev, stage, test]
+    branches: [main, dev, stage, test]
 defaults:
   run:
     working-directory: ./terraform
@@ -56,8 +71,8 @@ jobs:
           terraform plan -input=false -no-color -out=tfplan \
           && terraform show -no-color tfplan
         env:
-          TF_VAR_admin_email: ${{ secrets.ADMIN_EMAIL }}
-          TF_VAR_name: ${{ secrets.ORGANIZATION_NAME }}
+          TF_VAR_admin_email: ${{ inputs.admin_email }}
+          TF_VAR_name: ${{ inputs.name }}
           TF_VAR_oauth_token: ${{ secrets.OAUTH_TOKEN }}
 
       - name: Reformat Plan
@@ -79,8 +94,8 @@ jobs:
         id: apply
         continue-on-error: true
         env:
-          TF_VAR_admin_email: ${{ secrets.ADMIN_EMAIL }}
-          TF_VAR_name: ${{ secrets.ORGANIZATION_NAME }}
+          TF_VAR_admin_email: ${{ inputs.admin_email }}
+          TF_VAR_name: ${{ inputs.name }}
           TF_VAR_oauth_token: ${{ secrets.OAUTH_TOKEN }}
         run: |
           Get-ChildItem -Path Env: -Recurse -Include TF_VAR_* | ForEach-Object {Write-Output "$($_.Name)=$($_.Value)"} >> $env:GITHUB_ENV
