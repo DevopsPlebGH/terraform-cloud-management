@@ -45,6 +45,8 @@ jobs:
         id: apply
         continue-on-error: true
         env:
+          TF_VAR_admin_email: ${{ inputs.admin_email }}
+          TF_VAR_name: ${{ inputs.name }}
           TF_VAR_oauth_token: ${{ secrets.OAUTH_TOKEN }}
         run: |
           Get-ChildItem -Path Env: -Recurse -Include TF_VAR_* | ForEach-Object {Write-Output "$($_.Name)=$($_.Value)"} >> $env:GITHUB_ENV
@@ -62,6 +64,7 @@ jobs:
               openssl enc -d -in ./state/terraform.tfstate.enc -aes-256-cbc -pbkdf2 -pass pass:"${{ secrets.ENCRYPTION_KEY }}" -out ./terraform.tfstate
             }
           }
+          terraform plan -input=false -no-color -out tfplan
           terraform apply -input=false -no-color tfplan
           $StateExists = Test-Path -Path ./terraform.tfstate -PathType Leaf
           if ($StateExists){
