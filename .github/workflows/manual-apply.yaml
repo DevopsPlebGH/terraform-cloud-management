@@ -11,6 +11,10 @@ on:
         description: 'Organization Name'
         required: true
         type: string
+      oauth_token:
+        description: 'Github PAT Token'
+        required: true
+        type: string
 
 defaults:
   run:
@@ -39,7 +43,7 @@ jobs:
         env:
           TF_VAR_admin_email: ${{ inputs.admin_email }}
           TF_VAR_name: ${{ inputs.name }}
-          TF_VAR_oauth_token: ${{ secrets.OAUTH_TOKEN }}
+          TF_VAR_oauth_token: ${{ inputs.oauth_token }}
       - name: Apply Terraform
         if: steps.plan.outcome == 'success'
         id: apply
@@ -47,7 +51,7 @@ jobs:
         env:
           TF_VAR_admin_email: ${{ inputs.admin_email }}
           TF_VAR_name: ${{ inputs.name }}
-          TF_VAR_oauth_token: ${{ secrets.OAUTH_TOKEN }}
+          TF_VAR_oauth_token: ${{ inputs.oauth_token }}
         run: |
           Get-ChildItem -Path Env: -Recurse -Include TF_VAR_* | ForEach-Object {Write-Output "$($_.Name)=$($_.Value)"} >> $env:GITHUB_ENV
           $Repo = "${{ github.repository }}"
