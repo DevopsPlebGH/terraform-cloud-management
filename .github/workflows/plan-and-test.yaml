@@ -27,17 +27,17 @@ jobs:
   plan-on-test:
     name: Plan and  Test
     runs-on: macos-latest
-    needs: lint
-    #strategy:
-    #  fail-fast: false
-    #  matrix:
-    #    include:
-    #      - environment: testing
-    #        url: https://app.terraform.io/
+    #needs: lint
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - environment: testing
+            url: https://app.terraform.io/
 
-    #environment:
-    #  url: ${{ matrix.url }}
-    #  name: ${{ matrix.environment }}
+    environment:
+      url: ${{ matrix.url }}
+      name: ${{ matrix.environment }}
 
     steps:
 
