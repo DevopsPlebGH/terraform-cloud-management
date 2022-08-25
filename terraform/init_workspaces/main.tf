@@ -1,0 +1,21 @@
+module "workspace" {
+  source                        = "BrynardSecurity-terraform/terraform-cloud/tfe//modules/tfe_workspace"
+  version                       = "0.1.5"
+  allow_destroy_plan            = var.allow_destroy_plan
+  add_vcs_repo                  = var.add_vcs_repo
+  auto_apply                    = var.auto_apply
+  execution_mode                = var.execution_mode
+  file_triggers_enabled         = var.file_triggers_enabled
+  global_remote_state           = var.global_remote_state
+  name                          = var.name
+  oauth_token_id                = var.oauth_token_id
+  organization                  = var.organization
+  queue_all_runs                = var.queue_all_runs
+  speculative_enabled           = var.speculative_enabled
+  structured_run_output_enabled = var.structured_run_output_enabled
+  tags                          = var.tags
+  tfe_token                     = var.tfe_token
+  vcs_repository                = var.vcs_repository
+  vcs_branch                    = var.vcs_branch
+  working_directory             = var.working_directory
+}
