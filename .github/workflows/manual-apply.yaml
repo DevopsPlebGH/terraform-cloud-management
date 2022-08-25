@@ -1,4 +1,4 @@
-name: Terraform Apply
+name: Create Terraform Cloud Organization
 
 on:
   workflow_dispatch:
@@ -10,10 +10,6 @@ on:
       name:
         description: 'Organization Name'
         required: true
-        type: string
-      oauth_token:
-        description: 'Github PAT Token'
-        required: false
         type: string
 
 defaults:

@@ -1,4 +1,4 @@
-name: Terraform Destroy
+name: Create Terraform Cloud Organization
 
 on:
   workflow_dispatch:
@@ -11,18 +11,14 @@ on:
         description: 'Organization Name'
         required: true
         type: string
-      oauth_token:
-        description: 'Github PAT Token'
-        required: false
-        type: string
 
 defaults:
   run:
-    working-directory: ./terraform
+    working-directory: ./terraform/terraform_cloud_organization
 
 jobs:
-  terraform_destroy:
-    name: Terraform Destroy
+  create_org:
+    name: Create Terraform Cloud Organization
     runs-on: macos-latest
     steps:
       - name: Checkout code
@@ -68,10 +64,9 @@ jobs:
               openssl enc -d -in ./state/terraform.tfstate.enc -aes-256-cbc -pbkdf2 -pass pass:"${{ secrets.ENCRYPTION_KEY }}" -out ./terraform.tfstate
             }
           }
-          terraform workspace select "${{ inputs.name }}"
-          terraform plan -destroy -input=false -no-color -out tfplan
+          terraform workspace new "${{ inputs.name }}"
+          terraform plan -input=false -no-color -out tfplan
           terraform apply -input=false -no-color tfplan
-          terraform workspace delete "${{ inputs.name }}"
           $StateExists = Test-Path -Path ./terraform.tfstate -PathType Leaf
           if ($StateExists){
             openssl enc -in ./terraform.tfstate -aes-256-cbc -pbkdf2 -pass pass:"${{ secrets.ENCRYPTION_KEY }}" -out ./terraform.tfstate.enc
