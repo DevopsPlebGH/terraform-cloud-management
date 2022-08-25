@@ -16,7 +16,7 @@ jobs:
       - name: lower case
         id: lower
         run: |
-          echo "${{ inputs.string }}" | awk '{print tolower($0)}'
+          echo ${{ inputs.string }} | awk '{print tolower($0)}'
       - id: step2
         run: |
           echo ${{ steps.lower.outputs}}
