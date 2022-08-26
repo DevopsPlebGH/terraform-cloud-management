@@ -1,0 +1,30 @@
+name: Remote State Backend for New TF Organization
+
+on:
+  workflow_run:
+    workflows: ["Create Terraform Cloud Organization"]
+    branches: [backend-init]
+    types:
+      - completed
+
+defaults:
+  run:
+    working-directory: ./terraform
+
+jobs:
+  org_backend:
+    name: Create Org Backend
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.workflow_run.head_branch }}
+      - name: Download Statefile Artifact
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          github_token: ${{ github.token }}
+          name: terraformstatefile
+          workflow_conclusion: success
+      - name: Display downloaded files
+        run: ls -R
