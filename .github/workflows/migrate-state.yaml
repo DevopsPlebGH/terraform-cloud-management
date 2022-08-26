@@ -3,6 +3,7 @@ name: Remote State Backend for New TF Organization
 on:
   workflow_run:
     workflows: ["Create Terraform Cloud Organization"]
+    branches: [backend-init]
     types:
       - completed
 
@@ -22,6 +23,6 @@ jobs:
         with:
           github_token: ${{ github.token }}
           name: terraformstatefile
-          path: 
+          workflow_conclusion: success
       - name: Display downloaded files
         run: ls -R
