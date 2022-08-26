@@ -1,15 +1,17 @@
 name: Plan / Test on Pull Request
 
 on:
+  push:
+    branches: [test]
   pull_request:
-    branches: [main, dev, stage, test]
+    branches: [main, dev, stage]
 defaults:
   run:
     working-directory: ./terraform
 
 jobs:
   plan-on-test:
-    name: Plan and  Test
+    name: Terraform Test
     runs-on: macos-latest
     needs: lint
     strategy:
