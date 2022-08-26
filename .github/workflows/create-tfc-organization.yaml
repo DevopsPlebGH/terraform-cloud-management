@@ -93,3 +93,24 @@ jobs:
           name: terraformstatefile
           path: ${{ env.artifactPath }}
           if-no-files-found: error
+
+      - name: private.tfvars artifact
+        run: |
+          cat <<'EOF'>> ./private.tfvars
+          admin_email = ${{ inputs.admin_email }}
+          name = ${{ inputs.name }}
+          EOF
+
+          if [ -f ./private.tfvars ]; then
+            echo "Encrypting TFVars!"
+            openssl enc -in ./private.tfvars -aes-256-cbc -pbkdf2 -pass pass:"${{ secrets.ENCRYPTION_KEY }}" -out private.tfvars.enc
+            echo "TFVars=$(pwd)/private.tfvars.enc" >> $GITHUB_ENV
+          fi
+
+      - name: TFVars Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: tfvars
+          path: ${{ env.TFVars }}
+          if-no-files-found: error
+
