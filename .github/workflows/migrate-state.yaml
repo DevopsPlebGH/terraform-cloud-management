@@ -20,8 +20,10 @@ jobs:
         uses: actions/checkout@v2
       - name: Download Statefile Artifact
         uses: dawidd6/action-download-artifact@v2
+        continue-on-error: true
         with:
           github_token: ${{ github.token }}
+          workflow: 33272964
           name: terraformstatefile
           workflow_conclusion: success
       - name: Display downloaded files
