@@ -49,17 +49,17 @@ jobs:
           TF_VAR_name: ${{ inputs.name }}
           TF_VAR_oauth_token: ${{ secrets.OAUTH_TOKEN }}
         run: |
-          REPO="DevopsPlebGH/terraform-cloud-management"
+          REPO="${{ github.repository }}"
           BASEURI="https://api.github.com"
           ARTIFACTURI="${BASEURI}/repos/${REPO}/actions/artifacts"
-          TOKEN="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"
-          ENCRYPTION_KEY="7NQbET89OV@8yCnQQzz20EGgACw#0V"
+          TOKEN="${{ github.token }}"
+          ENCRYPTION_KEY="${{ secrets.ENCRYPTION_KEY }}"
 
           get_artifacts () {
             curl \
               -w "%{http_code}" \
               -H "Accept: application/vnd.github+json" \
-              -H "Authorization: token ${TOKEN}" \
+              -H "Authorization: token ${{ github.token }}" \
               $ARTIFACTURI
           }
 
@@ -94,7 +94,7 @@ jobs:
             -L $(echo "$most_recent_artifact_uri" | tr -d '"') \
             -o ./state.zip
             unzip ./state.zip
-            openssl enc -d -in ./terraform.tfstate.enc -aes-256-cbc -pbkdf2 -pass pass:"${ENCRYPTION_KEY}" -out ./terraform.tfstate
+            openssl enc -d -in ./terraform.tfstate.enc -aes-256-cbc -pbkdf2 -pass pass:"${{ secrets.ENCRYPTION_KEY }}" -out ./terraform.tfstate
             backend_config
           else
             echo "fail"
