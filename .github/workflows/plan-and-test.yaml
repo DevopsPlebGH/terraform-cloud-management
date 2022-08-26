@@ -1,4 +1,4 @@
-name: Plan and Test
+name: Plan / Test on Pull Request
 
 on:
   pull_request:
@@ -57,24 +57,8 @@ jobs:
         id: plan
         continue-on-error: true
         run: |
-          Get-ChildItem -Path Env: -Recurse -Include TF_VAR_* | ForEach-Object {Write-Output "$($_.Name)=$($_.Value)"} >> $env:GITHUB_ENV
-          $Repo = "${{ github.repository }}"
-          $BaseUri = "https://api.github.com"
-          $ArtifactUri = "$BaseUri/repos/$Repo/actions/artifacts"
-          $Token = "${{ github.token }}" | ConvertTo-SecureString -AsPlainText
-          $RestResponse = Invoke-RestMethod -Authentication Bearer -Uri $ArtifactUri -Token $Token | Select-Object -ExpandProperty artifacts
-          if ($RestResponse){
-            $MostRecentArtifactURI = $RestResponse | Sort-Object -Property created_at -Descending | where name -eq "terraformstatefile" | Select-Object -First 1 | Select-Object -ExpandProperty archive_download_url
-            Write-Host "Most recent artifact URI = $MostRecentArtifactURI"
-            if ($MostRecentArtifactURI){
-              Invoke-RestMethod -uri $MostRecentArtifactURI -Token $Token -Authentication bearer -outfile ./state.zip
-              Expand-Archive ./state.zip
-              openssl enc -d -in ./state/terraform.tfstate.enc -aes-256-cbc -pbkdf2 -pass pass:"${{ secrets.ENCRYPTION_KEY }}" -out ./terraform.tfstate
-            }
-          }
-          terraform plan -input=false -no-color -out=tfplan
-          terraform show -no-color tfplan
-        shell: pwsh
+          terraform plan -input=false -no-color -out tfplan \
+          && terraform show -no-color tfplan
         env:
           TF_VAR_admin_email: ${{ secrets.ADMIN_EMAIL }}
           TF_VAR_name: ${{ secrets.ORGANIZATION_NAME }}
@@ -108,18 +92,6 @@ jobs:
             #Gray
             ${{ env.PLAN }}
             ```
-
-      - name: Reformat Plan
-        run: |
-          echo '${{ steps.plan.outputs.stdout || steps.plan.outputs.stderr }}' \
-          | sed -E 's/^([[:space:]]+)([-+])/\2\1/g' > plan.txt
-
-      - name: Put Plan in Env Var
-        run: |
-          PLAN=$(cat plan.txt)
-          echo "PLAN<<EOF" >> $GITHUB_ENV
-          echo "$PLAN" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
 
       - name: Post Plan to GitHub PR
         uses: mshick/add-pr-comment@v1
