@@ -38,4 +38,4 @@ terraform.rc
 # Ansible
 *.retry
 
-*artifacts.sh
+artifacts.sh
