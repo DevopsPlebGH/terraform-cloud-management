@@ -43,7 +43,7 @@ jobs:
           fi
       - id: tfbackend
         run: |
-          cat <<EOF>> tfbackend.tf
+          cat <<'EOF'>> tfbackend.tf
           resource "local_file" "backend" {
             depends_on = [
               module.organization,
@@ -59,7 +59,7 @@ jobs:
           EOF
       - id: remote
         run: |
-          cat <<EOF>> remote.tf
+          cat <<'EOF'>> remote.tf
           terraform {
             backend "remote" {}
           }
