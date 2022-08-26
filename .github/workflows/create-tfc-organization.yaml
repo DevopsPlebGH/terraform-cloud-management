@@ -84,6 +84,8 @@ jobs:
           if [ -f "$StateFile" ]; then
             openssl enc -in ./terraform.tfstate -aes-256-cbc -pbkdf2 -pass pass:"${{ secrets.ENCRYPTION_KEY }}" -out ./terraform.tfstate.enc
             echo "artifactPath=$(pwd)/terraform.tfstate.enc" >> $GITHUB_ENV
+          fi
+          echo $GITHUB_ENV
 
       - name: Statefile artifact
         uses: actions/upload-artifact@v2
