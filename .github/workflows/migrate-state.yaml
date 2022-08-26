@@ -36,6 +36,7 @@ jobs:
         continue-on-error: true
         run: |
           if [ -f ./terraform.tfstate.enc ]; then
+            echo "Statefile found!"
             openssl enc -d -in ./terraform.tfstate.enc -aes-256-cbc -pbkdf2 -pass pass:"${{ secrets.ENCRYPTION_KEY }}" -out ./terraform.tfstate
           else
             echo "Encrypted statefile not found!"
