@@ -49,18 +49,16 @@ jobs:
           TF_VAR_name: ${{ inputs.name }}
           TF_VAR_oauth_token: ${{ secrets.OAUTH_TOKEN }}
         run: |
-          REPO="${{ github.repository }}"
-          BASEURI="https://api.github.com"
-          ARTIFACTURI="${BASEURI}/repos/${REPO}/actions/artifacts"
-          TOKEN="${{ github.token }}"
-          ENCRYPTION_KEY="${{ secrets.ENCRYPTION_KEY }}"
+          Repo="${{ github.repository }}"
+          BaseUri="https://api.github.com"
+          ArtifactUri="${BaseUri}/repos/${Repo}/actions/artifacts"
 
           get_artifacts () {
             curl \
               -w "%{http_code}" \
               -H "Accept: application/vnd.github+json" \
               -H "Authorization: token ${{ github.token }}" \
-              $ARTIFACTURI
+              $ArtifactUri
           }
 
           backend_config () {
@@ -95,11 +93,21 @@ jobs:
             -o ./state.zip
             unzip ./state.zip
             openssl enc -d -in ./terraform.tfstate.enc -aes-256-cbc -pbkdf2 -pass pass:"${{ secrets.ENCRYPTION_KEY }}" -out ./terraform.tfstate
-            backend_config
+            terraform plan -input=false -no-color -out tfplan
+            terraform apply -input=false -no-color tfplan
           else
             echo "fail"
             exit 0
           fi
 
-      - name: Display Files
-        run: ls
+          StateFile=./terraform.tfstate
+          if [ -f "$StateFile" ]; then
+            openssl enc -in ./terraform.tfstate -aes-256-cbc -pbkdf2 -pass pass:"${{ secrets.ENCRYPTION_KEY }}" -out ./terraform.tfstate.enc
+            echo "artifactPath=$(pwd)/terraform.tfstate.enc" >> $GITHUB_ENV
+
+      - name: Statefile artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: terraformstatefile
+          path: ${{ env.artifactPath }}
+          if-no-files-found: error
