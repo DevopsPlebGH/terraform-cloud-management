@@ -1,8 +1,6 @@
 name: Terraform Lint
 
 on:
-  push:
-    branches: [test]
   pull_request:
     branches: [main, dev, stage]
 defaults:
