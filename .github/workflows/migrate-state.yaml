@@ -25,6 +25,7 @@ jobs:
           github_token: ${{ github.token }}
           workflow: 33272964
           name: terraformstatefile
+          path: ./terraform/
           workflow_conclusion: success
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
