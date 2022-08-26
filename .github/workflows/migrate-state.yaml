@@ -60,6 +60,11 @@ jobs:
       - name: Initialize backend config file
         run: |
           terraform init -input=false
+      - name: Local File Resource
+        id: localfile
+        run: |
+          terraform plan -input=false -out tfplan \
+          && terraform show tfplan
       - id: remote
         run: |
           cat <<'EOF'>> remote.tf
