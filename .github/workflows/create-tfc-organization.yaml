@@ -61,23 +61,6 @@ jobs:
               $ArtifactUri
           }
 
-          backend_config () {
-            cat <<'EOF'>> tfbackend.tf
-          resource "local_file" "backend" {
-            depends_on = [
-              module.organization,
-              module.oauth_client
-            ]
-            content  = <<-EOT
-            workspaces { name = "tfc-org-${module.organization.tfe_organization_id}}
-            hostname = "app.terraform.io"
-            organization = "${module.organization.tfe_organization_id}"
-            EOT
-            filename = "${path.module}/config.remote.tfbackend"
-          }
-          EOF
-          }
-
           response=$(get_artifacts)
           http_code=$(tail -n1 <<< "$response")
           content=$(sed '$d' <<< "$response")
@@ -95,9 +78,6 @@ jobs:
             openssl enc -d -in ./terraform.tfstate.enc -aes-256-cbc -pbkdf2 -pass pass:"${{ secrets.ENCRYPTION_KEY }}" -out ./terraform.tfstate
             terraform plan -input=false -no-color -out tfplan
             terraform apply -input=false -no-color tfplan
-          else
-            echo "fail"
-            exit 0
           fi
 
           StateFile=./terraform.tfstate
