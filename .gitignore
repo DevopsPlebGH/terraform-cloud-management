@@ -1,5 +1,5 @@
 # Hashicorp Packer
-**/output*
+**/output/*
 # Local .terraform directories
 **/.terraform/*
 
