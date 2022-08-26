@@ -23,3 +23,7 @@ jobs:
       - name: Run terraform fmt check
         id: tffmt
         run: terraform fmt -check -diff -recursive ./
+
+      - name: Run Terraform Write Check
+        id: tfwrite
+        run: terraform fmt -write=true -recursive ./
