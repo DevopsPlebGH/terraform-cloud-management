@@ -1,0 +1,30 @@
+name: Remote State Backend for New TF Organization
+
+on:
+  workflow_run:
+    workflows: ["Create Terraform Cloud Organization"]
+    types:
+      - completed
+
+defaults:
+  run:
+    working-directory: ./terraform
+
+jobs:
+  org_backend:
+    name: Create Org Backend
+    runs-on: macos-latest
+    steps:
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+      - name: Initialize Terraform
+        run: |
+          terraform init -input=false
+      - name: Download Statefile Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: terraformstatefile
+      - name: Display downloaded files
+        run: ls -R
