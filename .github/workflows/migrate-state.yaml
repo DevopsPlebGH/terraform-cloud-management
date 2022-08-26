@@ -26,5 +26,16 @@ jobs:
           workflow: 33272964
           name: terraformstatefile
           workflow_conclusion: success
-      - name: Display downloaded files
-        run: ls -R
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+      - name: Migrate State
+        id: migrate
+        continue-on-error: true
+        run: |
+          if [ -f ./terraform.tfstate.enc ]; then
+            openssl enc -d -in ./terraform.tfstate.enc -aes-256-cbc -pbkdf2 -pass pass:"${{ secrets.ENCRYPTION_KEY }}" -out ./terraform.tfstate
+          else
+            echo "Encrypted statefile not found!"
+          fi
