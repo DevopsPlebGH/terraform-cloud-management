@@ -8,22 +8,6 @@ defaults:
     working-directory: ./terraform
 
 jobs:
-  lint:
-    name: Lint
-    runs-on: macos-latest
-    steps:
-      - name: Checkout code
-        id: checkout
-        uses: actions/checkout@v2
-
-      - name: Setup Terraform
-        id: setuptf
-        uses: hashicorp/setup-terraform@v1
-
-      - name: Run terraform fmt check
-        id: tffmt
-        run: terraform fmt -check -diff -recursive ./
-
   plan-on-test:
     name: Plan and  Test
     runs-on: macos-latest

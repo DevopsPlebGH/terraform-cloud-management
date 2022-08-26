@@ -1,0 +1,34 @@
+name: Auto Pull Request
+on:
+  push:
+    branches:
+      - 'test'
+      - '!main'
+      - '!dev'
+      - '!stage'
+
+jobs:
+  auto_pr:
+    name: Automatic Pull Request
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: "write"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - id: open-pr
+        uses: repo-sync/pull-request@v2
+        with:
+          pr_title: Automatic Pull Request
+          github_token: ${{ github.token }}
+          destination_branch: dev
+          pr_body: ":crown: **Automatic Pull Request**"
+          pr_label: automatic_pr,automerge,${{ github.head_ref }}
+          pr_template: ".github/workflows/PULL_REQUEST_TEMPLATE.md"
+      - name: output-url
+        run: echo ${{steps.open-pr.outputs.pr_url}}
+      - name: output-number
+        run: echo ${{steps.open-pr.outputs.pr_number}}
+      - name: output-has-changed-files
+        run: echo ${{steps.open-pr.outputs.has_changed_files}}
