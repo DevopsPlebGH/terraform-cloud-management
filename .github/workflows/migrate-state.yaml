@@ -57,6 +57,9 @@ jobs:
             filename = "${path.module}/config.remote.tfbackend"
           }
           EOF
+      - name: Initialize backend config file
+        run: |
+          terraform init -input=false
       - id: remote
         run: |
           cat <<'EOF'>> remote.tf
