@@ -15,6 +15,8 @@ jobs:
     name: Create Org Backend
     runs-on: macos-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
         with:
