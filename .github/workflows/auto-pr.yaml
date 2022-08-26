@@ -11,6 +11,8 @@ jobs:
   auto_pr:
     name: Automatic Pull Request
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: "write"
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
