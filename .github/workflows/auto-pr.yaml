@@ -1,9 +1,11 @@
 name: Auto Pull Request
 on:
-  workflow_run:
-    workflows: ["Terraform Lint"]
-    types:
-      - completed
+  push:
+    branches:
+      - 'test'
+      - '!main'
+      - '!dev'
+      - '!stage'
 
 jobs:
   auto_pr:
