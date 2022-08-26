@@ -3,7 +3,7 @@ name: Remote State Backend for New TF Organization
 on:
   workflow_run:
     workflows: ["Create Terraform Cloud Organization"]
-    branches: [backend-init]
+    branches: [main,dev,stage,test]
     types:
       - completed
 
@@ -18,8 +18,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-        with:
-          ref: ${{ github.event.workflow_run.head_branch }}
       - name: Download Statefile Artifact
         uses: dawidd6/action-download-artifact@v2
         with:
