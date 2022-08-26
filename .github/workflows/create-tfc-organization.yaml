@@ -70,7 +70,7 @@ jobs:
             most_recent_artifact_uri=$(echo "$content" | jq '[.artifacts[] | select(.name == "terraformstatefile" and .expired == false) | .archive_download_url][0]')
             echo "Most recent artifact URI is: " $most_recent_artifact_uri | tr -d '"'
             curl \
-            -H "Authorization: token ${TOKEN}" \
+            -H "Authorization: token ${{ github.token }}" \
             -H "Accept: application/vnd.github.v3.raw" \
             -L $(echo "$most_recent_artifact_uri" | tr -d '"') \
             -o ./state.zip
