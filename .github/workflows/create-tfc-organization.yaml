@@ -49,30 +49,43 @@ jobs:
           TF_VAR_name: ${{ inputs.name }}
           TF_VAR_oauth_token: ${{ secrets.OAUTH_TOKEN }}
         run: |
-          Get-ChildItem -Path Env: -Recurse -Include TF_VAR_* | ForEach-Object {Write-Output "$($_.Name)=$($_.Value)"} >> $env:GITHUB_ENV
-          $Repo = "${{ github.repository }}"
-          $BaseUri = "https://api.github.com"
-          $ArtifactUri = "$BaseUri/repos/$Repo/actions/artifacts"
-          $Token = "${{ github.token }}" | ConvertTo-SecureString -AsPlainText
-          $RestResponse = Invoke-RestMethod -Authentication Bearer -Uri $ArtifactUri -Token $Token | Select-Object -ExpandProperty artifacts
-          if ($RestResponse){
-            $MostRecentArtifactURI = $RestResponse | Sort-Object -Property created_at -Descending | where name -eq "terraformstatefile" | Select-Object -First 1 | Select-Object -ExpandProperty archive_download_url
-            Write-Host "Most recent artifact URI = $MostRecentArtifactURI"
-            if ($MostRecentArtifactURI){
-              Invoke-RestMethod -uri $MostRecentArtifactURI -Token $Token -Authentication bearer -outfile ./state.zip
-              Expand-Archive ./state.zip
-              openssl enc -d -in ./state/terraform.tfstate.enc -aes-256-cbc -pbkdf2 -pass pass:"${{ secrets.ENCRYPTION_KEY }}" -out ./terraform.tfstate
-            }
+          Repo="${{ github.repository }}"
+          BaseUri="https://api.github.com"
+          ArtifactUri="${BaseUri}/repos/${Repo}/actions/artifacts"
+
+          get_artifacts () {
+            curl \
+              -w "%{http_code}" \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: token ${{ github.token }}" \
+              $ArtifactUri
           }
-          terraform plan -input=false -no-color -out tfplan
-          terraform apply -input=false -no-color tfplan
-          $StateExists = Test-Path -Path ./terraform.tfstate -PathType Leaf
-          if ($StateExists){
+
+          response=$(get_artifacts)
+          http_code=$(tail -n1 <<< "$response")
+          content=$(sed '$d' <<< "$response")
+          most_recent_artifact_uri=$content | jq '[.artifacts[] | select(.name == "terraformstatefile" and .expired == false) | .archive_download_url][0]'
+
+          if [[ $http_code -eq 200 ]]; then
+            most_recent_artifact_uri=$(echo "$content" | jq '[.artifacts[] | select(.name == "terraformstatefile" and .expired == false) | .archive_download_url][0]')
+            echo "Most recent artifact URI is: " $most_recent_artifact_uri | tr -d '"'
+            curl \
+            -H "Authorization: token ${{ github.token }}" \
+            -H "Accept: application/vnd.github.v3.raw" \
+            -L $(echo "$most_recent_artifact_uri" | tr -d '"') \
+            -o ./state.zip
+            unzip ./state.zip
+            openssl enc -d -in ./terraform.tfstate.enc -aes-256-cbc -pbkdf2 -pass pass:"${{ secrets.ENCRYPTION_KEY }}" -out ./terraform.tfstate
+            terraform plan -input=false -no-color -out tfplan
+            terraform apply -input=false -no-color tfplan
+          fi
+
+          StateFile=./terraform.tfstate
+          if [ -f "$StateFile" ]; then
             openssl enc -in ./terraform.tfstate -aes-256-cbc -pbkdf2 -pass pass:"${{ secrets.ENCRYPTION_KEY }}" -out ./terraform.tfstate.enc
-            echo "artifactPath=$(pwd)/terraform.tfstate.enc" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          }
-          echo $env:GITHUB_ENV
-        shell: pwsh
+            echo "artifactPath=$(pwd)/terraform.tfstate.enc" >> $GITHUB_ENV
+          fi
+          echo $GITHUB_ENV
 
       - name: Statefile artifact
         uses: actions/upload-artifact@v2

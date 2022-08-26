@@ -5,16 +5,3 @@ module "organization" {
   admin_email = var.admin_email
   name        = var.name
 }
-
-#resource "local_file" "backend" {
-#  depends_on = [
-#    module.organization,
-#    module.oauth_client
-#  ]
-#  content  = <<-EOT
-#  workspaces { name = "tfc-org-${module.organization.tfe_organization_id}}
-#  hostname = "app.terraform.io"
-#  organization = "${module.organization.tfe_organization_id}"
-#  EOT
-#  filename = "${path.module}/config.remote.tfbackend"
-#}
