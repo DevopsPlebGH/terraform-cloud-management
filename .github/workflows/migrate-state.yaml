@@ -53,9 +53,11 @@ jobs:
       - name: Decrypt TFVars
         continue-on-error: true
         run: |
-          if [ -f ./private.tfvars ]; then
+          if [ -f ./private.tfvars.enc ]; then
             echo "Decrypting TFVars!"
             openssl enc -d -in ./private.tfvars.enc -aes-256-cbc -pbkdf2 -pass pass:"${{ secrets.ENCRYPTION_KEY }}" -out ./private.tfvars
+      - id: list
+        run: ls -lah
       - id: tfbackend
         run: |
           cat <<'EOF'>> tfbackend.tf
@@ -87,5 +89,4 @@ jobs:
             backend "remote" {}
           }
           EOF
-      - id: list
-        run: ls -lah
+
