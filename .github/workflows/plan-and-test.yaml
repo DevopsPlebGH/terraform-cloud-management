@@ -2,7 +2,7 @@ name: Plan / Test on Pull Request
 
 on:
   pull_request:
-    branches: [main, dev, stage]
+    branches: [main, dev, stage, test]
 defaults:
   run:
     working-directory: ./terraform
