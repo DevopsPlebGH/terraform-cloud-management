@@ -110,6 +110,15 @@ jobs:
           github_token: ${{ github.token }}
           name: terraformstatefile
           path: ./terraform/
+      - name: Decrypt Statefile
+        continue-on-error: true
+        run: |
+          if [ -f ./terraform.tfstate.enc ]; then
+            echo "Statefile found!"
+            openssl enc -d -in ./terraform.tfstate.enc -aes-256-cbc -pbkdf2 -pass pass:"${{ secrets.ENCRYPTION_KEY }}" -out ./terraform.tfstate
+          else
+            echo "Encrypted statefile not found!"
+          fi
       - name: Write tfbackend.tf
         id: write_tfbackend
         run: |
@@ -143,9 +152,22 @@ jobs:
         run: |
           terraform plan -input=false -out tfplan \
           && terraform apply -input=false tfplan
+
+          StateFile=./terraform.tfstate
+          if [ -f "$StateFile" ]; then
+            openssl enc -in ./terraform.tfstate -aes-256-cbc -pbkdf2 -pass pass:"${{ secrets.ENCRYPTION_KEY }}" -out ./terraform.tfstate.enc
+            echo "artifactPath=$(pwd)/terraform.tfstate.enc" >> $GITHUB_ENV
+          fi
+          echo $GITHUB_ENV
         continue-on-error: true
         env:
           TF_VAR_admin_email: ${{ inputs.admin_email }}
           TF_VAR_name: ${{ inputs.name }}
           TF_VAR_oauth_token: ${{ secrets.OAUTH_TOKEN }}
+      - name: Statefile artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: terraformstatefile
+          path: ${{ env.artifactPath }}
+          if-no-files-found: error
 
