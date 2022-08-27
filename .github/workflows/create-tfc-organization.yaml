@@ -142,16 +142,7 @@ jobs:
         run: |
           terraform init -input=false \
           && terraform plan -input=false -out=tfplan \
-          && terraform show tfplan
-        continue-on-error: true
-        env:
-          TF_VAR_admin_email: ${{ inputs.admin_email }}
-          TF_VAR_name: ${{ inputs.name }}
-          TF_VAR_oauth_token: ${{ secrets.OAUTH_TOKEN }}
-      - name: Local File Resource
-        id: apply_tfbackend
-        run: |
-          terraform plan -input=false -out tfplan \
+          && terraform show tfplan \
           && terraform apply -input=false tfplan
 
           StateFile=./terraform.tfstate
