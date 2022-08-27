@@ -110,6 +110,7 @@ jobs:
           github_token: ${{ github.token }}
           name: terraformstatefile
           path: ./terraform/
+          check_artifacts: true
       - name: Decrypt Statefile
         continue-on-error: true
         run: |
