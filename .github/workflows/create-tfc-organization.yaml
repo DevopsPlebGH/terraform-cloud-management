@@ -103,7 +103,7 @@ jobs:
 
           if [ -f ./private.tfvars ]; then
             echo "Adding private.tfvars to GITHUB_ENV"
-            echo "TFVars=$(pwd)/private.tfvars.enc" >> $GITHUB_ENV
+            echo "TFVars=$(pwd)/private.tfvars" >> $GITHUB_ENV
           else
             echo "private.tfvars not found!"
           fi
