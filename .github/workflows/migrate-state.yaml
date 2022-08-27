@@ -74,7 +74,7 @@ jobs:
       - name: Local File Resource
         id: localfile
         run: |
-          terraform plan -var-file ./private.tfvars -input=false -out tfplan \
+          terraform plan -input=false -out tfplan \
           && terraform show tfplan
       - id: remote
         run: |
