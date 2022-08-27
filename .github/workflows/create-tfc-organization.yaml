@@ -92,8 +92,13 @@ jobs:
           name: terraformstatefile
           path: ${{ env.artifactPath }}
           if-no-files-found: error
+  migrate_state:
+    name: Migrate Local State from Artifact to Remote State
+    runs-on: macos-latest
+    needs: create_org
+    steps:
       - name: Write tfbackend.tf
-        id: tfbackend
+        id: write_tfbackend
         run: |
           cat <<'EOF'>> tfbackend.tf
           resource "local_file" "backend" {
@@ -110,6 +115,7 @@ jobs:
           }
           EOF
       - name: Create config.remote.tfbackend resource
+        id: init_tfbackend
         run: |
           terraform init -input=false \
           && terraform plan -input=false -out=tfplan \
@@ -120,10 +126,10 @@ jobs:
           TF_VAR_name: ${{ inputs.name }}
           TF_VAR_oauth_token: ${{ secrets.OAUTH_TOKEN }}
       - name: Local File Resource
-        id: localfile
+        id: write_tfbackend
         run: |
           terraform plan -input=false -out tfplan \
-          && terraform show tfplan
+          && terraform apply -input=false tfplan
         continue-on-error: true
         env:
           TF_VAR_admin_email: ${{ inputs.admin_email }}
