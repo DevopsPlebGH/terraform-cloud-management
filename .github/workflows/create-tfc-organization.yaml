@@ -86,33 +86,33 @@ jobs:
             echo "artifactPath=$(pwd)/terraform.tfstate.enc" >> $GITHUB_ENV
           fi
           echo $GITHUB_ENV
-
+      - id: tfbackend
+        run: |
+          cat <<'EOF'>> tfbackend.tf
+          resource "local_file" "backend" {
+            depends_on = [
+              module.organization,
+              module.oauth_client
+            ]
+            content = <<-EOT
+            workspaces { name = "tfc-org-${module.organization.tfe_organization_id}}
+            hostname = "app.terraform.io"
+            organization = "${module.organization.tfe_organization_id}"
+            EOT
+            filename = "${path.module}/config.remote.tfbackend"
+          }
+          EOF
+      - id: init_tfbackend
+        run: |
+          terraform init -input=false
+      - name: Local File Resource
+        id: localfile
+        run: |
+          terraform plan -var-file ./private.tfvars -input=false -out tfplan \
+          && terraform show tfplan
       - name: Statefile artifact
         uses: actions/upload-artifact@v2
         with:
           name: terraformstatefile
           path: ${{ env.artifactPath }}
           if-no-files-found: error
-
-      - name: private.tfvars artifact
-        run: |
-          cat <<'EOF'>> ./private.tfvars
-          admin_email = ${{ inputs.admin_email }}
-          name = ${{ inputs.name }}
-          EOF
-
-          if [ -f ./private.tfvars ]; then
-            echo "Adding private.tfvars to GITHUB_ENV"
-            echo "TFVars=$(pwd)/private.tfvars" >> $GITHUB_ENV
-          else
-            echo "private.tfvars not found!"
-          fi
-          echo $GITHUB_ENV
-
-      - name: TFVars Artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: tfvars
-          path: ${{ env.TFVars }}
-          if-no-files-found: error
-
