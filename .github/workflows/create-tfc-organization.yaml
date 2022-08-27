@@ -126,7 +126,7 @@ jobs:
           TF_VAR_name: ${{ inputs.name }}
           TF_VAR_oauth_token: ${{ secrets.OAUTH_TOKEN }}
       - name: Local File Resource
-        id: write_tfbackend
+        id: apply_tfbackend
         run: |
           terraform plan -input=false -out tfplan \
           && terraform apply -input=false tfplan
