@@ -92,7 +92,8 @@ jobs:
           name: terraformstatefile
           path: ${{ env.artifactPath }}
           if-no-files-found: error
-      - id: tfbackend
+      - name: Write tfbackend.tf
+        id: tfbackend
         run: |
           cat <<'EOF'>> tfbackend.tf
           resource "local_file" "backend" {
@@ -108,12 +109,24 @@ jobs:
             filename = "${path.module}/config.remote.tfbackend"
           }
           EOF
-      - id: init_tfbackend
+      - name: Create config.remote.tfbackend resource
         run: |
-          terraform init -input=false
+          terraform init -input=false \
+          && terraform plan -input=false -out=tfplan \
+          && terraform show tfplan
+        continue-on-error: true
+        env:
+          TF_VAR_admin_email: ${{ inputs.admin_email }}
+          TF_VAR_name: ${{ inputs.name }}
+          TF_VAR_oauth_token: ${{ secrets.OAUTH_TOKEN }}
       - name: Local File Resource
         id: localfile
         run: |
           terraform plan -input=false -out tfplan \
           && terraform show tfplan
+        continue-on-error: true
+        env:
+          TF_VAR_admin_email: ${{ inputs.admin_email }}
+          TF_VAR_name: ${{ inputs.name }}
+          TF_VAR_oauth_token: ${{ secrets.OAUTH_TOKEN }}
 
