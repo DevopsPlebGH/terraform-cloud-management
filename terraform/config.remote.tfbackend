@@ -1,3 +1,0 @@
-workspaces {name = "test-workspace"}
-hostname = "app.terraform.io"
-organization = "devopspleb_test"
