@@ -102,9 +102,10 @@ jobs:
           EOF
 
           if [ -f ./private.tfvars ]; then
-            echo "Encrypting TFVars!"
-            openssl enc -in ./private.tfvars -aes-256-cbc -pbkdf2 -pass pass:"${{ secrets.ENCRYPTION_KEY }}" -out private.tfvars.enc
+            echo "Adding private.tfvars to $GITHUB_ENV"
             echo "TFVars=$(pwd)/private.tfvars.enc" >> $GITHUB_ENV
+          else
+            echo "private.tfvars not found!"
           fi
 
       - name: TFVars Artifact
