@@ -11,11 +11,6 @@ on:
         description: 'Organization Name'
         required: true
         type: string
-      oauth_token:
-        description: 'Github PAT Token'
-        required: false
-        type: string
-        default: ${{ secrets.OAUTH_TOKEN }}
 
 defaults:
   run:
@@ -44,7 +39,7 @@ jobs:
         env:
           TF_VAR_admin_email: ${{ inputs.admin_email }}
           TF_VAR_name: ${{ inputs.name }}
-          TF_VAR_oauth_token: ${{ inputs.oauth_token}}
+          TF_VAR_oauth_token: ${{ secrets.OAUTH_TOKEN }}
       - name: Apply Terraform
         if: steps.plan.outcome == 'success'
         id: apply
@@ -52,7 +47,7 @@ jobs:
         env:
           TF_VAR_admin_email: ${{ inputs.admin_email }}
           TF_VAR_name: ${{ inputs.name }}
-          TF_VAR_oauth_token: ${{ inputs.oauth_token }}
+          TF_VAR_oauth_token: ${{ secrets.OAUTH_TOKEN }}
         run: |
           terraform plan -input=false -no-color -out tfplan
           terraform apply -input=false -no-color tfplan
