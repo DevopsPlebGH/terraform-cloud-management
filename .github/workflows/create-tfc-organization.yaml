@@ -86,6 +86,12 @@ jobs:
             echo "artifactPath=$(pwd)/terraform.tfstate.enc" >> $GITHUB_ENV
           fi
           echo $GITHUB_ENV
+      - name: Statefile artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: terraformstatefile
+          path: ${{ env.artifactPath }}
+          if-no-files-found: error
       - id: tfbackend
         run: |
           cat <<'EOF'>> tfbackend.tf
@@ -108,11 +114,6 @@ jobs:
       - name: Local File Resource
         id: localfile
         run: |
-          terraform plan -var-file -input=false -out tfplan \
+          terraform plan -input=false -out tfplan \
           && terraform show tfplan
-      - name: Statefile artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: terraformstatefile
-          path: ${{ env.artifactPath }}
-          if-no-files-found: error
+
