@@ -108,7 +108,7 @@ jobs:
       - name: Local File Resource
         id: localfile
         run: |
-          terraform plan -var-file ./private.tfvars -input=false -out tfplan \
+          terraform plan -var-file -input=false -out tfplan \
           && terraform show tfplan
       - name: Statefile artifact
         uses: actions/upload-artifact@v2
