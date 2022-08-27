@@ -101,16 +101,13 @@ jobs:
           name = ${{ inputs.name }}
           EOF
 
-      - id: list
-        run: ls -lah
-
-      - name: Add TFVars to Github Environment Variable
           if [ -f ./private.tfvars ]; then
             echo "Adding private.tfvars to GITHUB_ENV"
             echo "TFVars=$(pwd)/private.tfvars.enc" >> $GITHUB_ENV
           else
             echo "private.tfvars not found!"
           fi
+          echo $GITHUB_ENV
 
       - name: TFVars Artifact
         uses: actions/upload-artifact@v2
