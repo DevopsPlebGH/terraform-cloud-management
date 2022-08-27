@@ -164,10 +164,18 @@ jobs:
           TF_VAR_admin_email: ${{ inputs.admin_email }}
           TF_VAR_name: ${{ inputs.name }}
           TF_VAR_oauth_token: ${{ secrets.OAUTH_TOKEN }}
-      - name: Statefile artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: terraformstatefile
-          path: ${{ env.artifactPath }}
-          if-no-files-found: error
-
+      - name: Write remote.tf
+        run: |
+          cat <<'EOF'>> remote.tf
+          terraform {
+            backend "remote" {}
+          }
+          EOF
+      - name: Migrate State
+        run: |
+          echo "yes" | terraform init -backend-config=config.remote.tfbackend
+        continue-on-error: true
+        env:
+          TF_VAR_admin_email: ${{ inputs.admin_email }}
+          TF_VAR_name: ${{ inputs.name }}
+          TF_VAR_oauth_token: ${{ secrets.OAUTH_TOKEN }}
