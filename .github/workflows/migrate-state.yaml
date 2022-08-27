@@ -61,7 +61,7 @@ jobs:
               module.oauth_client
             ]
             content = <<-EOT
-            workspaces { name = "tfc-org-${module.organization.tfe_organization_id}}
+            workspaces { name = "tfc-org-${module.organization.tfe_organization_id}"}
             hostname = "app.terraform.io"
             organization = "${module.organization.tfe_organization_id}"
             EOT
