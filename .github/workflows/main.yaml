@@ -42,13 +42,14 @@ jobs:
         id: decrypt
         if: steps.artifact.outcome == 'success'
         run: |
-          EncryptedStateFile=./terraform.tfstate.enc
-          if [ -f "$EncryptedStateFile" ]; then
+          if [ -f ./terraform.tfstate.enc ]; then
+            echo "Encrypted statefile found! Decrypting statefile..."
             openssl enc -d -in ./terraform.tfstate.enc -aes-256-cbc -pbkdf2 -pass pass:"${{ secrets.ENCRYPTION_KEY }}" -out ./terraform.tfstate
+          else
+            echo "Encrypted statefile not found!"
           fi
 
-          ls -lah \
-          && cat ./terraform.tfstate
+          ls -lah 
       - name: Plan Terraform
         id: plan
         continue-on-error: true
