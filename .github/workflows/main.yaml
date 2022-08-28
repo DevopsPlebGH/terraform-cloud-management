@@ -30,6 +30,10 @@ jobs:
       - name: Initialize Terraform
         run: |
           terraform init -input=false
+      - id: debug
+        run: |
+          pwd \
+          && ls -lah
       - name: Download Statefile Artifact
         id: artifact
         uses: dawidd6/action-download-artifact@v2
@@ -49,7 +53,7 @@ jobs:
             echo "Encrypted statefile not found!"
           fi
 
-          ls -lah 
+          ls -lah
       - name: Plan Terraform
         id: plan
         continue-on-error: true
