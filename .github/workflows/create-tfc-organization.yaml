@@ -30,6 +30,22 @@ jobs:
       - name: Initialize Terraform
         run: |
           terraform init -input=false
+      - name: Download Statefile Artifact
+        id: artifact
+        uses: dawidd6/action-download-artifact@v2
+        continue-on-error: true
+        with:
+          github_token: ${{ github.token }}
+          workflow: 33272964
+          name: terraformstatefile
+      - name: Decrypt artifact file
+        id: decrypt
+        if: steps.artifact.outcome == 'success'
+        run: |
+          EncryptedStateFile=./terraform.tfstate.enc
+          if [ -f "$EncryptedStateFile" ]; then
+            openssl enc -d -in ./terraform.tfstate.enc -aes-256-cbc -pbkdf2 -pass pass:"${{ secrets.ENCRYPTION_KEY }}" -out ./terraform.tfstate
+          fi
       - name: Plan Terraform
         id: plan
         continue-on-error: true
@@ -51,3 +67,15 @@ jobs:
         run: |
           terraform plan -input=false -no-color -out tfplan
           terraform apply -input=false -no-color tfplan
+          StateFile=./terraform.tfstate
+          if [ -f "$StateFile" ]; then
+            openssl enc -in ./terraform.tfstate -aes-256-cbc -pbkdf2 -pass pass:"${{ secrets.ENCRYPTION_KEY }}" -out ./terraform.tfstate.enc
+            echo "artifactPath=$(pwd)/terraform.tfstate.enc" >> $GITHUB_ENV
+          fi
+          echo $GITHUB_ENV
+      - name: Statefile artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: terraformstatefile
+          path: ${{ env.artifactPath }}
+          if-no-files-found: error
