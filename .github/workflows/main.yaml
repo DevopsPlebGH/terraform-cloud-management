@@ -19,7 +19,7 @@ defaults:
 jobs:
   create_org:
     name: Create Terraform Cloud Organization
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -38,7 +38,7 @@ jobs:
           github_token: ${{ github.token }}
           workflow: 33485138
           name: terraformstatefile
-          path: ./terraform
+          path: ./
       - name: Decrypt artifact file
         id: decrypt
         if: steps.artifact.outcome == 'success'
