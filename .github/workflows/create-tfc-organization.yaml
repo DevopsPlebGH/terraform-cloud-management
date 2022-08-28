@@ -11,6 +11,9 @@ on:
         description: 'Organization Name'
         required: true
         type: string
+environment:
+  run: true
+
 
 defaults:
   run:
@@ -22,15 +25,19 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Checkout code
+        if: ${{ env.run == 'true' }}
         uses: actions/checkout@v2
       - name: Setup Terraform
+        if: ${{ env.run = 'true' }}
         uses: hashicorp/setup-terraform@v1
         with:
           cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
       - name: Initialize Terraform
+        if: ${{ env.run == 'true' }}
         run: |
           terraform init -input=false
       - name: Download Statefile Artifact
+        if: ${{ env.run == 'true' }}
         id: artifact
         uses: dawidd6/action-download-artifact@v2
         continue-on-error: true
@@ -39,6 +46,7 @@ jobs:
           workflow: 33272964
           name: terraformstatefile
       - name: Decrypt artifact file
+        if: ${{ env.run == 'true' }}
         id: decrypt
         if: steps.artifact.outcome == 'success'
         run: |
@@ -46,7 +54,10 @@ jobs:
           if [ -f "$EncryptedStateFile" ]; then
             openssl enc -d -in ./terraform.tfstate.enc -aes-256-cbc -pbkdf2 -pass pass:"${{ secrets.ENCRYPTION_KEY }}" -out ./terraform.tfstate
           fi
+
+          ls -lah | grep terraform
       - name: Plan Terraform
+        if: ${{ env.run == 'true' }}
         id: plan
         continue-on-error: true
         run: |
@@ -57,6 +68,7 @@ jobs:
           TF_VAR_name: ${{ inputs.name }}
           TF_VAR_oauth_token: ${{ secrets.OAUTH_TOKEN }}
       - name: Apply Terraform
+        if: ${{ env.run == 'true' }}
         if: steps.plan.outcome == 'success'
         id: apply
         continue-on-error: true
@@ -64,6 +76,7 @@ jobs:
           TF_VAR_admin_email: ${{ inputs.admin_email }}
           TF_VAR_name: ${{ inputs.name }}
           TF_VAR_oauth_token: ${{ secrets.OAUTH_TOKEN }}
+          run: false
         run: |
           terraform plan -input=false -no-color -out tfplan
           terraform apply -input=false -no-color tfplan
@@ -74,8 +87,11 @@ jobs:
           fi
           echo $GITHUB_ENV
       - name: Statefile artifact
+        if: ${{ env.run == 'true' }}
         uses: actions/upload-artifact@v2
         with:
           name: terraformstatefile
           path: ${{ env.artifactPath }}
           if-no-files-found: error
+        env:
+          run: false
