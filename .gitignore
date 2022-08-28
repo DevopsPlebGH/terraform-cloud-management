@@ -1,3 +1,5 @@
+# ACT ignored files
+.github/.act/private*
 # Hashicorp Packer
 **/output/*
 # Local .terraform directories
