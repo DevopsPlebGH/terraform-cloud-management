@@ -38,7 +38,7 @@ jobs:
           github_token: ${{ github.token }}
           workflow: 33485138
           name: terraformstatefile
-          path: ./
+          path: ./terraform
       - name: Decrypt artifact file
         id: decrypt
         if: steps.artifact.outcome == 'success'
