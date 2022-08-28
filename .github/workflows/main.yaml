@@ -30,10 +30,6 @@ jobs:
       - name: Initialize Terraform
         run: |
           terraform init -input=false
-      - id: debug
-        run: |
-          pwd \
-          && ls -lah
       - name: Download Statefile Artifact
         id: artifact
         uses: dawidd6/action-download-artifact@v2
@@ -42,6 +38,7 @@ jobs:
           github_token: ${{ github.token }}
           workflow: 33485138
           name: terraformstatefile
+          path: ./terraform
       - name: Decrypt artifact file
         id: decrypt
         if: steps.artifact.outcome == 'success'
